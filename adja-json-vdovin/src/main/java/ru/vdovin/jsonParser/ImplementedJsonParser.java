@@ -8,7 +8,6 @@ import java.util.List;
 
 public class ImplementedJsonParser implements StreamingJsonParser {
     private static final List<Character> ELEMENT_REMOVE = Arrays.asList('\n', '\r', '\t', ' ');
-    public JSONObjectImpl jsonObject = new JSONObjectImpl();
     private JSONElement jsonElement;
 
     public JSONElement parse(Reader r) {
@@ -30,9 +29,6 @@ public class ImplementedJsonParser implements StreamingJsonParser {
     public JSONElement parseString(JsonParseReader jpr){
         StringBuffer string = new StringBuffer();
         while (!isBlockedSimbols(jpr.getElement())){
-            //FIXME: в яве так нельзя,  в яве строки иммутабельн и += создает каждый
-            // раз новый объект, это очень медленно и много мусора. Если хочешь собирать по одной
-            // букве используй StringBuilder или StringBuffer
             string.append((char) jpr.getElement());
             jpr.nextElement();
         }
@@ -46,6 +42,7 @@ public class ImplementedJsonParser implements StreamingJsonParser {
     }
 
     public JSONElement parseObject(JsonParseReader jpr){
+        JSONObjectImpl jsonObject = new JSONObjectImpl();
         String key = "";
         do{
             jpr.nextElement();
@@ -63,7 +60,7 @@ public class ImplementedJsonParser implements StreamingJsonParser {
 
             jpr.nextElement();
             checkIsRemove(jpr);
-            jsonElement = chooseJson(jpr);
+           JSONElement jsonElement = chooseJson(jpr);
 
             jsonObject.add(key, jsonElement);
             key= "";
@@ -93,8 +90,9 @@ public class ImplementedJsonParser implements StreamingJsonParser {
             checkIsRemove(jpr);
         }
         String el = string.toString();
-        if (el.matches("[-]?[0-9]+")){
-            jsonElement = new JSONPrimitiveImpl(el);
+        if (isLong(el)) {
+            jsonElement = new JSONPrimitiveImpl(Long.parseLong(el));
+        } else if (isInteger(el)){
         } else if (isDouble(el)){
             jsonElement = new JSONPrimitiveImpl(Double.parseDouble(el));
         }else if (isQuote(el)){
@@ -112,7 +110,7 @@ public class ImplementedJsonParser implements StreamingJsonParser {
     }
 
     private String removeUncorrectEl(String value){
-        if (value.endsWith("\n") || value.endsWith("\t") || value.endsWith("\r")){
+        if (value.endsWith("\n") || value.endsWith("\t") || value.endsWith("\r") || value.endsWith(" ")){
             return removeUncorrectEl(value.substring(0, value.length() - 1));
         }
         return value;
@@ -141,6 +139,24 @@ public class ImplementedJsonParser implements StreamingJsonParser {
             return false;
         }
         return true;
+    }
+
+    private boolean isInteger(String value){
+        try{
+            Integer.parseInt(value);
+            return  true;
+        }catch (Exception e){
+            return false;
+        }
+    }
+
+    private boolean isLong(String value){
+        try{
+            Long.parseLong(value);
+            return true;
+        } catch (Exception e){
+            return false;
+        }
     }
 
     public void checkIsRemove(JsonParseReader jpr){

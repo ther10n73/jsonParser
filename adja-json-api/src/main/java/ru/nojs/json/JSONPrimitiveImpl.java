@@ -27,6 +27,9 @@ public class JSONPrimitiveImpl implements JSONPrimitive {
         obj = value;
     }
 
+    public Object getAsObject(){
+        return obj;
+    }
     boolean isTypeValue(Object object){
         if (object instanceof String){
             return true;
@@ -54,7 +57,11 @@ public class JSONPrimitiveImpl implements JSONPrimitive {
 
     @Override
     public BigDecimal getAsBigDecimal() {
-        return null;
+        try{
+        return new BigDecimal(getAsDouble());
+        } catch (Exception e){
+            throw new IllegalArgumentException("This is not BigDecimal type");
+        }
     }
 
     @Override

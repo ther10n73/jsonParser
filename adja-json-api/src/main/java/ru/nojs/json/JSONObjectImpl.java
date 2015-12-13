@@ -6,7 +6,7 @@ import java.math.*;
 import java.util.*;
 
 public class JSONObjectImpl implements JSONObject {
-    private final Map<String, JSONElement> map= new LinkedHashMap<>();
+    private final Map<String, JSONElement> map= new LinkedHashMap<String, JSONElement>();
 
     @Override
     public void add(String property, JSONElement obj) {
@@ -29,7 +29,7 @@ public class JSONObjectImpl implements JSONObject {
 
     @Override
     public Set<Map.Entry<String, JSONElement>> entrySet() {
-        return null;
+        return map.entrySet();
     }
 
     @Override

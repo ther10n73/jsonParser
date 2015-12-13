@@ -3,14 +3,11 @@ package ru.vdovin.jsonParser;
 import org.junit.Assert;
 import org.junit.Test;
 import ru.nojs.json.JSONElement;
-import ru.nojs.json.StreamingJsonParser;
 import ru.vdovin.Currency;
 
 import java.io.StringReader;
 import java.math.BigDecimal;
 import java.util.Map;
-
-import static org.junit.Assert.*;
 
 public class ReflectionMapperTest {
 
@@ -45,7 +42,7 @@ public class ReflectionMapperTest {
 
 
     @Test(expected = NoSuchFieldException.class)
-    public void testIllegalArgument() {
+    public void testIllegalArgument() throws NoSuchFieldException{
         String noSuchField =
                 "{\n" +
                 "  \"a\": \"a\",\n" +
