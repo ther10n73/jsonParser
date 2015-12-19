@@ -41,7 +41,7 @@ public class ReflectionMapperTest {
     }
 
 
-    @Test(expected = NoSuchFieldException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void testIllegalArgument() throws NoSuchFieldException{
         String noSuchField =
                 "{\n" +
@@ -53,7 +53,7 @@ public class ReflectionMapperTest {
         SimplePOJO sp = mapper.createObject(je, SimplePOJO.class);
     }
 
-    class SimplePOJO {
+    static class SimplePOJO {
         String a;
         int b;
 

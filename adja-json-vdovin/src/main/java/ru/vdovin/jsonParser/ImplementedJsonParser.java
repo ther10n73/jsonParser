@@ -15,56 +15,60 @@ public class ImplementedJsonParser implements StreamingJsonParser {
         return chooseJson(jpr);
     }
 
-    public JSONElement chooseJson(JsonParseReader jpr){
+    public JSONElement chooseJson(JsonParseReader jpr) {
         jpr.nextElement();
         checkIsRemove(jpr);
-        switch (jpr.getElement()){
-            case '{': return parseObject(jpr);
-            case '[': return parseArray(jpr);
-            case '"': return parseString(jpr);
+        switch (jpr.getElement()) {
+            case '{':
+                return parseObject(jpr);
+            case '[':
+                return parseArray(jpr);
+            case '"':
+                return parseString(jpr);
             default:
-                return getPrimitive(jpr);}
+                return getPrimitive(jpr);
+        }
     }
 
-    public JSONElement parseString(JsonParseReader jpr){
+    public JSONElement parseString(JsonParseReader jpr) {
         StringBuffer string = new StringBuffer();
-        while (!isBlockedSimbols(jpr.getElement())){
+        while (!isBlockedSimbols(jpr.getElement())) {
             string.append((char) jpr.getElement());
             jpr.nextElement();
         }
         String s = string.toString();
         s = s.replace("\\", "");
-        s = removeUncorrectEl(s);
-        if (isQuote(s)){
-            return new JSONPrimitiveImpl(s.substring(1, s.length() -1));
+        s = removeElement(s);
+        if (isQuote(s)) {
+            return new JSONPrimitiveImpl(s.substring(1, s.length() - 1));
         }
         throw new IllegalArgumentException("Parse Error!!!");
     }
 
-    public JSONElement parseObject(JsonParseReader jpr){
+    public JSONElement parseObject(JsonParseReader jpr) {
         JSONObjectImpl jsonObject = new JSONObjectImpl();
         String key = "";
-        do{
+        do {
             jpr.nextElement();
             checkIsRemove(jpr);
-            if (jpr.getElement() == '"'){
+            if (jpr.getElement() == '"') {
                 jpr.nextElement();
             } else {
                 throw new IllegalArgumentException("Error syntax in object");
             }
 
-            while (jpr.getElement()!='"'){
-                key+=(char)jpr.getElement();
+            while (jpr.getElement() != '"') {
+                key += (char) jpr.getElement();
                 jpr.nextElement();
             }
 
             jpr.nextElement();
             checkIsRemove(jpr);
-           JSONElement jsonElement = chooseJson(jpr);
+            JSONElement jsonElement = chooseJson(jpr);
 
             jsonObject.add(key, jsonElement);
-            key= "";
-            if (jpr.getElement()=='"') {
+            key = "";
+            if (jpr.getElement() == '"') {
                 jpr.nextElement();
             }
             checkIsRemove(jpr);
@@ -73,7 +77,7 @@ public class ImplementedJsonParser implements StreamingJsonParser {
         return jsonObject;
     }
 
-    public JSONElement parseArray(JsonParseReader jpr){
+    public JSONElement parseArray(JsonParseReader jpr) {
         JSONArrayImpl JSONArrayImpl = new JSONArrayImpl();
         do {
             JSONArrayImpl.add(chooseJson(jpr));
@@ -82,85 +86,86 @@ public class ImplementedJsonParser implements StreamingJsonParser {
         return JSONArrayImpl;
     }
 
-    public JSONElement getPrimitive(JsonParseReader jpr){
+    public JSONElement getPrimitive(JsonParseReader jpr) {
         StringBuffer string = new StringBuffer();
-        while (!isBlockedSimbols(jpr.getElement())){
+        while (!isBlockedSimbols(jpr.getElement())) {
             string.append((char) jpr.getElement());
             jpr.nextElement();
             checkIsRemove(jpr);
         }
         String el = string.toString();
-        if (isLong(el)) {
+        if (isInteger(el)) {
+            jsonElement = new JSONPrimitiveImpl((Integer.parseInt(el)));
+        } else if (isLong(el)) {
             jsonElement = new JSONPrimitiveImpl(Long.parseLong(el));
-        } else if (isInteger(el)){
-        } else if (isDouble(el)){
+        } else if (isDouble(el)) {
             jsonElement = new JSONPrimitiveImpl(Double.parseDouble(el));
-        }else if (isQuote(el)){
+        } else if (isQuote(el)) {
             jsonElement = new JSONPrimitiveImpl(el);
-        } else if (isNull(el)){
+        } else if (isNull(el)) {
             jsonElement = new JSONNullImpl();
-        } else if (isBoolean(el)){
+        } else if (isBoolean(el)) {
             jsonElement = new JSONPrimitiveImpl(Boolean.parseBoolean(el));
         }
         return jsonElement;
     }
 
-    private boolean isBlockedSimbols(int rd){
-        return rd == '}' || rd ==']' || rd == -1 || rd == ',';
+    private boolean isBlockedSimbols(int rd) {
+        return rd == '}' || rd == ']' || rd == -1 || rd == ',';
     }
 
-    private String removeUncorrectEl(String value){
-        if (value.endsWith("\n") || value.endsWith("\t") || value.endsWith("\r") || value.endsWith(" ")){
-            return removeUncorrectEl(value.substring(0, value.length() - 1));
+    private String removeElement(String value) {
+        if (value.endsWith("\n") || value.endsWith("\t") || value.endsWith("\r") || value.endsWith(" ")) {
+            return removeElement(value.substring(0, value.length() - 1));
         }
         return value;
     }
 
-    private boolean isQuote(String value){
-        return value.startsWith("\"")&&value.endsWith("\"");
+    private boolean isQuote(String value) {
+        return value.startsWith("\"") && value.endsWith("\"");
     }
 
-    private boolean isNull(String value){
+    private boolean isNull(String value) {
         return value.equals("null");
     }
 
-    private boolean isBoolean(String value){
-        if (value.equals("true")||value.equals("false")){
+    private boolean isBoolean(String value) {
+        if (value.equals("true") || value.equals("false")) {
             return true;
         } else {
             throw new IllegalArgumentException("Bad syntax!!");
         }
     }
 
-    private boolean isDouble(String value){
-        try{
+    private boolean isDouble(String value) {
+        try {
             Double.parseDouble(value);
-        }catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
         return true;
     }
 
-    private boolean isInteger(String value){
-        try{
+    private boolean isInteger(String value) {
+        try {
             Integer.parseInt(value);
-            return  true;
-        }catch (Exception e){
+            return true;
+        } catch (Exception e) {
             return false;
         }
     }
 
-    private boolean isLong(String value){
-        try{
+    private boolean isLong(String value) {
+        try {
             Long.parseLong(value);
             return true;
-        } catch (Exception e){
+        } catch (Exception e) {
             return false;
         }
     }
 
-    public void checkIsRemove(JsonParseReader jpr){
-        while (ELEMENT_REMOVE.contains((char)(jpr.getElement()))){
+    public void checkIsRemove(JsonParseReader jpr) {
+        while (ELEMENT_REMOVE.contains((char) (jpr.getElement()))) {
             jpr.nextElement();
         }
     }
