@@ -39,8 +39,7 @@ public class ReflectionMapper {
                 .forEach(je -> {
 
                     String setMethod = setterNameOf(je.getKey());
-                    Method method = null;
-                    method = Stream.of(targetType.getMethods())
+                    Method method = Stream.of(targetType.getMethods())
                             .filter(method1 -> method1.getName().equals(setMethod) && method1.getParameterCount() == 1)
                             .findFirst()
                             .orElseThrow(() -> new IllegalArgumentException("No field " + je.getKey()));

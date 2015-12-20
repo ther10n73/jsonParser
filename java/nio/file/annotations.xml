@@ -1,5 +1,0 @@
-<root>
-  <item name='java.nio.file.NoSuchFileException'>
-    <annotation name='java.lang.annotation.Deprecated'/>
-  </item>
-</root>
