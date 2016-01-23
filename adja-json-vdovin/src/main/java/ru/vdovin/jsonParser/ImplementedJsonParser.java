@@ -4,10 +4,11 @@ import ru.nojs.json.*;
 
 import java.io.Reader;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ImplementedJsonParser implements StreamingJsonParser {
-    private static final List<Character> ELEMENT_REMOVE = Arrays.asList('\n', '\r', '\t', ' ');
+    private static final Set<Character> INSIGINFICANT_SIMBOLS = new HashSet<Character>(Arrays.asList('\n', '\r', '\t', ' '));
     private JSONElement jsonElement;
 
     public JSONElement parse(Reader r) {
@@ -32,14 +33,14 @@ public class ImplementedJsonParser implements StreamingJsonParser {
 
     public JSONElement parseString(JsonParseReader jpr) {
         StringBuffer string = new StringBuffer();
-        while (!isBlockedSimbols(jpr.getElement())) {
+        while (!isEndMarker(jpr.getElement())) {
             string.append((char) jpr.getElement());
             jpr.nextElement();
+            checkIsRemove(jpr);
         }
         String s = string.toString();
         s = s.replace("\\", "");
-        s = removeElement(s);
-        if (isQuote(s)) {
+        if (enclosedInQuotes(s)) {
             return new JSONPrimitiveImpl(s.substring(1, s.length() - 1));
         }
         throw new IllegalArgumentException("Parse Error!!!");
@@ -88,40 +89,35 @@ public class ImplementedJsonParser implements StreamingJsonParser {
 
     public JSONElement getPrimitive(JsonParseReader jpr) {
         StringBuffer string = new StringBuffer();
-        while (!isBlockedSimbols(jpr.getElement())) {
+        while (!isEndMarker(jpr.getElement())) {
             string.append((char) jpr.getElement());
             jpr.nextElement();
             checkIsRemove(jpr);
         }
         String el = string.toString();
         if (isInteger(el)) {
-            jsonElement = new JSONPrimitiveImpl((Integer.parseInt(el)));
+            jsonElement = new JSONPrimitiveImpl(Integer.parseInt(el));
         } else if (isLong(el)) {
             jsonElement = new JSONPrimitiveImpl(Long.parseLong(el));
         } else if (isDouble(el)) {
             jsonElement = new JSONPrimitiveImpl(Double.parseDouble(el));
-        } else if (isQuote(el)) {
+        } else if (enclosedInQuotes(el)) {
             jsonElement = new JSONPrimitiveImpl(el);
         } else if (isNull(el)) {
             jsonElement = new JSONNullImpl();
         } else if (isBoolean(el)) {
             jsonElement = new JSONPrimitiveImpl(Boolean.parseBoolean(el));
+        } else {
+            throw new IllegalArgumentException("Bad syntax!!");
         }
         return jsonElement;
     }
 
-    private boolean isBlockedSimbols(int rd) {
+    private boolean isEndMarker(int rd) {
         return rd == '}' || rd == ']' || rd == -1 || rd == ',';
     }
 
-    private String removeElement(String value) {
-        if (value.endsWith("\n") || value.endsWith("\t") || value.endsWith("\r") || value.endsWith(" ")) {
-            return removeElement(value.substring(0, value.length() - 1));
-        }
-        return value;
-    }
-
-    private boolean isQuote(String value) {
+    private boolean enclosedInQuotes(String value) {
         return value.startsWith("\"") && value.endsWith("\"");
     }
 
@@ -133,7 +129,7 @@ public class ImplementedJsonParser implements StreamingJsonParser {
         if (value.equals("true") || value.equals("false")) {
             return true;
         } else {
-            throw new IllegalArgumentException("Bad syntax!!");
+            return false;
         }
     }
 
@@ -165,7 +161,7 @@ public class ImplementedJsonParser implements StreamingJsonParser {
     }
 
     public void checkIsRemove(JsonParseReader jpr) {
-        while (ELEMENT_REMOVE.contains((char) (jpr.getElement()))) {
+        while (INSIGINFICANT_SIMBOLS.contains((char) (jpr.getElement()))) {
             jpr.nextElement();
         }
     }

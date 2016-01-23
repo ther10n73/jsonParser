@@ -6,6 +6,7 @@ import ru.nojs.json.JSONElement;
 import ru.vdovin.Currency;
 
 import java.io.StringReader;
+import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.Map;
 
@@ -42,7 +43,7 @@ public class ReflectionMapperTest {
 
 
     @Test(expected = IllegalArgumentException.class)
-    public void testIllegalArgument() throws NoSuchFieldException{
+    public void testIllegalArgument() throws NoSuchFieldException, NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         String noSuchField =
                 "{\n" +
                 "  \"a\": \"a\",\n" +

@@ -1,24 +1,23 @@
 package ru.vdovin.jsonParser;
 
+import com.sun.istack.internal.NotNull;
+
 import java.io.IOException;
 import java.io.Reader;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  * Created by Юыху on 25.11.2015.
  */
 public class JsonParseReader {
 
+    @NotNull
+    private Reader reader;
+
+    private int element;
+
     public JsonParseReader(Reader reader){
         this.reader=reader;
     }
-
-    private Reader reader;
-
-
-
-    private int element;
 
     public int getElement() {
         return element;

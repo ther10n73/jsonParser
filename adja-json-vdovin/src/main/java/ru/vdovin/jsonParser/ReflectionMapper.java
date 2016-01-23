@@ -6,6 +6,7 @@ import ru.nojs.json.JSONObject;
 import ru.nojs.json.JSONPrimitiveImpl;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.util.HashMap;
@@ -13,26 +14,17 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public class ReflectionMapper {
-    public <T> T createObject(JSONElement je, Class<T> targetType) throws NoSuchFieldException {
+    public <T> T createObject(JSONElement je, Class<T> targetType) throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         T obj;
         JSONObject jo = je.getAsJsonObject();
-        //Constructor[] constructors = targetType.getConstructors();
-        try {
-            obj = createDefualtConstrucnor(jo, targetType);
-        } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException(e);
-        }
+            obj = createDefaultConstrucnor(jo, targetType);
         return obj;
     }
 
-    public <T> T createDefualtConstrucnor(JSONObject jo, Class<T> targetType) {
+    public <T> T createDefaultConstrucnor(JSONObject jo, Class<T> targetType) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
         T obj;
-        try {
             Constructor<T> constructor = targetType.getDeclaredConstructor();
             obj = constructor.newInstance();
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e.getMessage());
-        }
 
         jo
                 .entrySet()
