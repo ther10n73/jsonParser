@@ -17,11 +17,11 @@ public class ReflectionMapper {
     public <T> T createObject(JSONElement je, Class<T> targetType) throws NoSuchFieldException, InvocationTargetException, NoSuchMethodException, InstantiationException, IllegalAccessException {
         T obj;
         JSONObject jo = je.getAsJsonObject();
-            obj = createConstrucnor(jo, targetType);
+            obj = createConstructor(jo, targetType);
         return obj;
     }
 
-    public <T> T createConstrucnor(JSONObject jo, Class<T> targetType) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
+    public <T> T createConstructor(JSONObject jo, Class<T> targetType) throws IllegalAccessException, InvocationTargetException, InstantiationException, NoSuchMethodException {
         T obj;
             Constructor<T> constructor = targetType.getDeclaredConstructor();
             obj = constructor.newInstance();

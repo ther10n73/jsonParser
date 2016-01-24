@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class ImplementedJsonParser implements StreamingJsonParser {
-    private static final Set<Character> INSIGNIFICANT_SIMBOLS = new HashSet<>(Arrays.asList('\n', '\r', '\t', ' '));
+    private static final Set<Character> INSIGNIFICANT_SYMBOLS = new HashSet<>(Arrays.asList('\n', '\r', '\t', ' '));
     private JSONElement jsonElement;
 
     public JSONElement parse(Reader r) {
@@ -134,7 +134,7 @@ public class ImplementedJsonParser implements StreamingJsonParser {
     }
 
     public void checkIsRemove(JsonParseReader jpr) {
-        while (INSIGNIFICANT_SIMBOLS.contains((char) (jpr.getElement()))) {
+        while (INSIGNIFICANT_SYMBOLS.contains((char) (jpr.getElement()))) {
             jpr.nextElement();
         }
     }
