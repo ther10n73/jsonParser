@@ -36,4 +36,45 @@ public class JsonParseReader {
     }
 
 
+    public Double doubleValue(String value){
+        return Double.parseDouble(value);
+    }
+
+    public int integerValue(String value){
+        return Integer.parseInt(value);
+    }
+
+    public long longValue(String value){
+        return Long.parseLong(value);
+    }
+
+
+    public boolean isLong(String value) {
+        try {
+            longValue(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    public boolean isDouble(String value) {
+        try {
+            doubleValue(value);
+        } catch (Exception e) {
+            return false;
+        }
+        return true;
+    }
+
+    public boolean isInteger(String value) {
+        try {
+            integerValue(value);
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+
 }

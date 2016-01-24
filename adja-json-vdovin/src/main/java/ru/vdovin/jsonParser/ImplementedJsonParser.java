@@ -95,12 +95,12 @@ public class ImplementedJsonParser implements StreamingJsonParser {
             checkIsRemove(jpr);
         }
         String el = string.toString();
-        if (isInteger(el)) {
-            jsonElement = new JSONPrimitiveImpl(Integer.parseInt(el));
-        } else if (isLong(el)) {
-            jsonElement = new JSONPrimitiveImpl(Long.parseLong(el));
-        } else if (isDouble(el)) {
-            jsonElement = new JSONPrimitiveImpl(Double.parseDouble(el));
+        if (jpr.isDouble(el)) {
+            jsonElement = new JSONPrimitiveImpl(jpr.doubleValue(el));
+        } else if (jpr.isLong(el)) {
+            jsonElement = new JSONPrimitiveImpl(jpr.longValue(el));
+        } else if (jpr.isInteger(el)) {
+            jsonElement = new JSONPrimitiveImpl(jpr.integerValue(el));
         } else if (enclosedInQuotes(el)) {
             jsonElement = new JSONPrimitiveImpl(el);
         } else if (isNull(el)) {
@@ -129,33 +129,6 @@ public class ImplementedJsonParser implements StreamingJsonParser {
         if (value.equals("true") || value.equals("false")) {
             return true;
         } else {
-            return false;
-        }
-    }
-
-    private boolean isDouble(String value) {
-        try {
-            Double.parseDouble(value);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
-
-    private boolean isInteger(String value) {
-        try {
-            Integer.parseInt(value);
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    private boolean isLong(String value) {
-        try {
-            Long.parseLong(value);
-            return true;
-        } catch (Exception e) {
             return false;
         }
     }
