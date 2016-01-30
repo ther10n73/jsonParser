@@ -35,32 +35,38 @@ public class ReflectionMapper {
                             .filter(method1 -> method1.getName().equals(setMethod) && method1.getParameterCount() == 1)
                             .findFirst()
                             .orElseThrow(() -> new IllegalArgumentException("No field " + je.getKey()));
-                    try {
-                        Class typeClass = method.getParameterTypes()[0];
-                        if (typeClass == BigDecimal.class) {
-                            BigDecimal bd = je.getValue().getAsBigDecimal();
-                            method.invoke(obj, bd);
-                        } else if (typeClass == Map.class) {
-                            Map<String, String> map = new HashMap<>();
-                            JSONObject jso = je.getValue().getAsJsonObject();
-                            for (Map.Entry<String, JSONElement> jse : jso.entrySet()) {
-                                JSONPrimitiveImpl jpi = (JSONPrimitiveImpl) jse.getValue().getAsJsonPrimitive();
-                                map.put(jse.getKey(), String.valueOf(jpi.getAsObject()));
-                            }
-                            method.invoke(obj, map);
-                        } else if (typeClass.isEnum()) {
-                            Enum enums = (Enum) Stream.of(typeClass.getEnumConstants())
-                                    .filter(e -> e.toString().equals(je.getValue().getAsString()))
-                                    .findFirst().orElseThrow(() -> new IllegalArgumentException("Don't have enum"));
-                            method.invoke(obj, enums);
-                        } else {
-                            JSONPrimitiveImpl jpi = (JSONPrimitiveImpl) je.getValue().getAsJsonPrimitive();
-                            method.invoke(obj, jpi.getAsObject());
-                        }
-                    } catch (Exception e) {
-                        throw new IllegalArgumentException(e);
-                    }
+                    methodInvoke(obj, method, je);
+
                 });
+        return obj;
+    }
+
+    public <T> T methodInvoke(T obj, Method method, Map.Entry<String, JSONElement> je) {
+        try {
+            Class typeClass = method.getParameterTypes()[0];
+            if (typeClass == BigDecimal.class) {
+                BigDecimal bd = je.getValue().getAsBigDecimal();
+                method.invoke(obj, bd);
+            } else if (typeClass == Map.class) {
+                Map<String, String> map = new HashMap<>();
+                JSONObject jso = je.getValue().getAsJsonObject();
+                for (Map.Entry<String, JSONElement> jse : jso.entrySet()) {
+                    JSONPrimitiveImpl jpi = (JSONPrimitiveImpl) jse.getValue().getAsJsonPrimitive();
+                    map.put(jse.getKey(), String.valueOf(jpi.getAsObject()));
+                }
+                method.invoke(obj, map);
+            } else if (typeClass.isEnum()) {
+                Enum enums = (Enum) Stream.of(typeClass.getEnumConstants())
+                        .filter(e -> e.toString().equals(je.getValue().getAsString()))
+                        .findFirst().orElseThrow(() -> new IllegalArgumentException("Don't have enum"));
+                method.invoke(obj, enums);
+            } else {
+                JSONPrimitiveImpl jpi = (JSONPrimitiveImpl) je.getValue().getAsJsonPrimitive();
+                method.invoke(obj, jpi.getAsObject());
+            }
+        } catch (Exception e) {
+            throw new IllegalArgumentException(e);
+        }
         return obj;
     }
 
